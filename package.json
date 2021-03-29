@@ -1,0 +1,20 @@
+{
+  "name": "langfilter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prestart": "npm run build",
+    "start": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "fast-csv": "^4.3.6"
+  }
+}

@@ -1,0 +1,4 @@
+.idea/
+tweets.csv
+dist/
+node_modules/
