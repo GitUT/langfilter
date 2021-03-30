@@ -27,25 +27,11 @@ const readStream = fs.createReadStream(filepath)
         headers: ['id','user','fullname','url','timestamp','replies','likes','retweets','text','language'],
         delimiter: ";",
     }))
-    .transform(async (row) =>
-    {
-        let analysis = await cld.detect(row.text);
-        let langCode = analysis.languages[0].code;
-        console.log(langCode);
-        let returnable = {
-            id: row.id,
-            user: row.user,
-            fullname: row.fullname,
-            url: row.url,
-            timestamp: row.timestamp,
-            replies: row.replies,
-            likes: row.likes,
-            retweets: row.retweets,
-            text: row.text,
-            language: langCode,
-        }
-        console.log(returnable);
-        return returnable;
+    .transform((row) => {
+        cld.detect(row.text, (err, result) => {
+            row.language = result.languages[0].code;
+            return row;
+        })
     })
 
     // Write to file
