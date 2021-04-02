@@ -15,6 +15,42 @@ const writeStream = fs.createWriteStream(defs.outFilePath);
 const parseOptions = {headers: true, delimiter: ";"};
 const parser = csv.parse(parseOptions);
 
+function rowTransformer() {
+    function onLanguage(row: defs.RowType, cb) {
+        cld.detect(row.text, (err, result) => {
+            if (result) {
+                let code = result.languages[0].code;
+                if (code == 'en') {
+                    counter.incrementEnCount();
+                } else {
+                    row = null;
+                }
+            } else {
+                counter.incrementUnknownCount();
+                row = null;
+            }
+            cb(null, row);
+        });
+    }
+
+    function onDate(row: defs.RowType, cb) {
+        const date = new Date(row.timestamp.substr(0,19) + ".001Z");
+        if (date > defs.startDate && date < defs.endDate) {
+            counter.incrementRowsWithinDates();
+            cb(null, row);
+        } else {
+            cb(null, null);
+        }
+    }
+
+    const transformerMapper = {
+        [defs.Action.language]: onLanguage,
+        [defs.Action.date]: onDate,
+    }
+
+    return transformerMapper[action];
+}
+
 console.time('timer');
 
 // Parse file
@@ -33,54 +69,7 @@ readStream.pipe(parser)
     .pipe(csv.format<defs.RowType, defs.RowType>(parseOptions))
 
     // Transform row
-    .transform((row) => {
-        const date = new Date(row.timestamp.substr(0,19) + ".001Z");
-        if (date > defs.startDate && date < defs.endDate) {
-            counter.incrementRowsWithinDates();
-            return row;
-        } else {
-            return null;
-        }
-    })
-
-// .transform((row, cb) => {
-//     cld.detect(row.text, (err, result) => {
-//         if (result) {
-//             let code = result.languages[0].code;
-//             if (code == 'en') {
-//                 ++enCount;
-//             }
-//             cb(null, {
-//                 id: row.id,
-//                 user: row.user,
-//                 fullname: row.fullname,
-//                 url: row.url,
-//                 timestamp: row.timestamp,
-//                 replies: row.replies,
-//                 likes: row.likes,
-//                 retweets: row.retweets,
-//                 text: row.text,
-//                 language: code,
-//             });
-//         }
-//         else {
-//             ++errCount;
-//             cb(null, {
-//                 id: row.id,
-//                 user: row.user,
-//                 fullname: row.fullname,
-//                 url: row.url,
-//                 timestamp: row.timestamp,
-//                 replies: row.replies,
-//                 likes: row.likes,
-//                 retweets: row.retweets,
-//                 text: row.text,
-//                 language: "unknown",
-//             });
-//             // console.log(err);
-//         }
-//     });
-// })
+    .transform(rowTransformer())
     // Write to file
     .pipe(writeStream);
 

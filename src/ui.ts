@@ -20,18 +20,18 @@ export function actionPrompt(): defs.Action {
 
 // Printer function
 export function onEnd(action: defs.Action, counter: Counter): void {
-    function onLangEnd(): void {
+    function onLanguage(): void {
         message("Detected English: " + counter.enCount);
         message("Unknowns: " + counter.unknownCount);
     }
 
-    function onDateEnd(): void {
+    function onDate(): void {
         message("Rows within dates: " + counter.rowsWithinDates);
     }
 
     const actionMapper = {
-        [defs.Action.language]: onLangEnd,
-        [defs.Action.date]: onDateEnd,
+        [defs.Action.language]: onLanguage,
+        [defs.Action.date]: onDate,
     }
     actionMapper[action]();
 }
