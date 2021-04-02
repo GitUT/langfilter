@@ -2,64 +2,41 @@ import * as csv from 'fast-csv';
 import * as fs from 'fs';
 import * as cld from 'cld';
 
-import {actionPrompt} from "./ui";
+import * as ui from "./ui";
 import * as defs from "./definitions";
+import Counter from "./counter";
 
 
-const action = actionPrompt();
-
-// Counters
-let enCount = 0;
-let unknownCount = 0;
-let rowsWithinDates = 0;
-
-
-// Printer functions
-function onLangEnd(): void {
-    console.log("Detected English: " + enCount);
-    console.log("Unknowns: " + unknownCount);
-}
-
-function onDateEnd(): void {
-    console.log("Rows within dates: " + rowsWithinDates);
-}
-
-function onEnd(): void {
-    const actionMapper = {
-        [defs.Action.language]: onLangEnd,
-        [defs.Action.date]: onDateEnd,
-    }
-    actionMapper[action]();
-}
+const action = ui.actionPrompt();
+const counter = new Counter();
 
 const readStream = fs.createReadStream(defs.inFilePath);
 const writeStream = fs.createWriteStream(defs.outFilePath);
-const parser = csv.parse({headers:true, delimiter: ";"});
+const parseOptions = {headers: true, delimiter: ";"};
+const parser = csv.parse(parseOptions);
 
 console.time('timer');
+
 // Parse file
 readStream.pipe(parser)
-    .on('error', error => console.log(error))
+    .on('error', error => ui.error(error))
     .on('end', (rowCount: number) => {
-    console.log(`Parsed ${rowCount} rows`);
-    onEnd();
-    console.timeEnd('timer');
+    ui.message(`Parsed ${rowCount} rows`);
+    ui.onEnd(action, counter);
+    ui.message('timer');
     })
 
     // Necessary for incrementing rowCount
     .on('data', (row) => {})
 
     // Format row
-    .pipe(csv.format<RowType, RowType>({
-    headers: ['id','user','fullname','url','timestamp','replies','likes','retweets','text'],
-    delimiter: ";",
-    }))
+    .pipe(csv.format<defs.RowType, defs.RowType>(parseOptions))
 
     // Transform row
     .transform((row) => {
         const date = new Date(row.timestamp.substr(0,19) + ".001Z");
-        if (date > startDate && date < endDate) {
-            ++rowsWithinDates;
+        if (date > defs.startDate && date < defs.endDate) {
+            counter.incrementRowsWithinDates();
             return row;
         } else {
             return null;
