@@ -2,42 +2,38 @@ import * as csv from 'fast-csv';
 import * as fs from 'fs';
 import * as cld from 'cld';
 
-const inFile = "tweets.csv";
-const inFilePath = __dirname+"/../assets/" + inFile;
-
-const outFile = "out.csv";
-const outFilePath = __dirname+"/../assets" + outFile;
+import {actionPrompt} from "./ui";
+import * as defs from "./definitions";
 
 
+const action = actionPrompt();
 
-type inRow = {
-    id: string,
-    user: string,
-    fullname: string,
-    url: string,
-    timestamp: string,
-    replies: string,
-    likes: string,
-    retweets: string,
-    text: string,
+// Counters
+let enCount = 0;
+let unknownCount = 0;
+let rowsWithinDates = 0;
+
+
+// Printer functions
+function onLangEnd(): void {
+    console.log("Detected English: " + enCount);
+    console.log("Unknowns: " + unknownCount);
 }
 
-type outRow = inRow & {
-    language: string
-};
+function onDateEnd(): void {
+    console.log("Rows within dates: " + rowsWithinDates);
+}
 
-// let enCount = 0;
-// let unknownCount = 0;
+function onEnd(): void {
+    const actionMapper = {
+        [defs.Action.language]: onLangEnd,
+        [defs.Action.date]: onDateEnd,
+    }
+    actionMapper[action]();
+}
 
-const date1 = new Date('2017-11-01 00:00:00.000Z');
-const date2 = new Date('2017-12-16 23:59:59.999Z');
-const date3 = new Date('2017-12-17 00:00:00.000Z');
-const date4 = new Date('2018-01-20 23:59:59.999Z');
-const startDate = date1;
-const endDate = date2;
-
-const readStream = fs.createReadStream(inFilePath);
-const writeStream = fs.createWriteStream(outFilePath);
+const readStream = fs.createReadStream(defs.inFilePath);
+const writeStream = fs.createWriteStream(defs.outFilePath);
 const parser = csv.parse({headers:true, delimiter: ";"});
 
 console.time('timer');
@@ -46,8 +42,7 @@ readStream.pipe(parser)
     .on('error', error => console.log(error))
     .on('end', (rowCount: number) => {
     console.log(`Parsed ${rowCount} rows`);
-    // console.log("Detected English: " + enCount);
-    // console.log("Unknowns: " + unknownCount);
+    onEnd();
     console.timeEnd('timer');
     })
 
@@ -55,7 +50,7 @@ readStream.pipe(parser)
     .on('data', (row) => {})
 
     // Format row
-    .pipe(csv.format<outRow, outRow>({
+    .pipe(csv.format<RowType, RowType>({
     headers: ['id','user','fullname','url','timestamp','replies','likes','retweets','text'],
     delimiter: ";",
     }))
@@ -64,20 +59,12 @@ readStream.pipe(parser)
     .transform((row) => {
         const date = new Date(row.timestamp.substr(0,19) + ".001Z");
         if (date > startDate && date < endDate) {
+            ++rowsWithinDates;
             return row;
         } else {
             return null;
         }
     })
-
-// .transform((row, cb) => {
-//     const date = new Date(row.timestamp.substr(0,19) + ".001Z");
-//     if (date > date1 && date < date4) {
-//         cb(null, row);
-//     } else {
-//         cb(null, null);
-//     }
-// })
 
 // .transform((row, cb) => {
 //     cld.detect(row.text, (err, result) => {
