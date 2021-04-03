@@ -7,7 +7,7 @@ import Counter from "./counter";
 const prompter = promptMaker();
 
 export function actionPrompt(): defs.Action {
-    message("Choose from actions: language, date: ");
+    message("Choose from actions: count, language, date: ");
     const action: string = prompter("> ");
     if (!(action in defs.Action)) {
         message("Unknown action. Exiting program");
@@ -19,7 +19,7 @@ export function actionPrompt(): defs.Action {
 }
 
 // Printer function
-export function onEnd(action: defs.Action, counter: Counter): void {
+export function onEnd(action: defs.Action, counter: Counter, rowCount: number): void {
     function onLanguage(): void {
         message("Detected English: " + counter.enCount);
         message("Unknowns: " + counter.unknownCount);
@@ -33,7 +33,11 @@ export function onEnd(action: defs.Action, counter: Counter): void {
         [defs.Action.language]: onLanguage,
         [defs.Action.date]: onDate,
     }
+
+    message(`Parsed ${rowCount} rows`);
     actionMapper[action]();
+    message('Time elapsed: ');
+    console.timeEnd('timer');
 }
 
 export function message(message: string) {

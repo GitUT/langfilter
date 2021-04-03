@@ -53,25 +53,33 @@ function rowTransformer() {
 
 console.time('timer');
 
-// Parse file
-readStream.pipe(parser)
-    .on('error', error => ui.error(error))
-    .on('end', (rowCount: number) => {
-    ui.message(`Parsed ${rowCount} rows`);
-    ui.onEnd(action, counter);
-    ui.message('timer');
-    })
+if (action == defs.Action.count) {
+    readStream.pipe(csv.parse({headers: true}))
+        .on('error', error => ui.error(error))
+        .on('end', (rowCount: number) => {
+            ui.message(`Parsed ${rowCount} rows`);
+            console.timeEnd('timer');
+        })
+        .on('data', (row) => {});
+} else {
+    // Parse file
+    readStream.pipe(parser)
+        .on('error', error => ui.error(error))
+        .on('end', (rowCount: number) => {
+            ui.onEnd(action, counter, rowCount);
+        })
 
-    // Necessary for incrementing rowCount
-    .on('data', (row) => {})
+        // Necessary for incrementing rowCount
+        .on('data', (row) => {})
 
-    // Format row
-    .pipe(csv.format<defs.RowType, defs.RowType>(parseOptions))
+        // Format row
+        .pipe(csv.format<defs.RowType, defs.RowType>(parseOptions))
 
-    // Transform row
-    .transform(rowTransformer())
-    // Write to file
-    .pipe(writeStream);
+        // Transform row
+        .transform(rowTransformer())
+        // Write to file
+        .pipe(writeStream);
+}
 
 
 
