@@ -1,10 +1,12 @@
 import * as csv from 'fast-csv';
 import * as fs from 'fs';
-import * as cld from 'cld';
+import cld from 'cld';
+import twitter from 'twitter-text';
 
-import * as ui from "./ui";
-import * as defs from "./definitions";
-import Counter from "./counter";
+import * as ui from "./ui.js";
+import * as defs from "./definitions.js";
+import Counter from "./counter.js";
+
 
 
 const action = ui.actionPrompt();
@@ -16,7 +18,9 @@ const parseOptions = {headers: true, delimiter: ";"};
 const parser = csv.parse(parseOptions);
 
 function hashFinder(tweet: string): string[] {
-    return ["fasafas","fafewfhe"];
+    const hashtags = twitter.extractHashtags(tweet);
+    console.log(hashtags);
+    return hashtags;
 }
 
 function rowTransformer() {

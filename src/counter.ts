@@ -3,7 +3,7 @@ export default class Counter {
     private _enCount = 0;
     private _unknownCount = 0;
     private _rowsWithinDates = 0;
-    private _hashtags: {[hashtag: string]: number};
+    private _hashtags: {[hashtag: string]: number} = {};
 
     // Getters
     get enCount(): number {

@@ -1,5 +1,8 @@
-// The available actions
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
+
+// The available actions
 export enum Action {
     language = "language",
     date = "date",
@@ -9,6 +12,9 @@ export enum Action {
 
 
 // Files
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 export const inFile = "loppujakso_en.csv";
 export const inFilePath = __dirname+"/../assets/" + inFile;
 
