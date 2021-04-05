@@ -15,6 +15,10 @@ const writeStream = fs.createWriteStream(defs.outFilePath);
 const parseOptions = {headers: true, delimiter: ";"};
 const parser = csv.parse(parseOptions);
 
+function hashFinder(tweet: string): string[] {
+    return ["fasafas","fafewfhe"];
+}
+
 function rowTransformer() {
     function onLanguage(row: defs.RowType, cb) {
         cld.detect(row.text, (err, result) => {
@@ -41,10 +45,14 @@ function rowTransformer() {
         } else {
             cb(null, null);
         }
-    }5
+    }
 
-    function onHashtags(row: defs.HashRowType, cb) {
-
+    function onHashtags(row: defs.RowType, cb) {
+        const hashtags = hashFinder(row.text);
+        for (let hashtag of hashtags) {
+            counter.incrementHashTagCount(hashtag);
+        }
+            cb(null, null);
     }
 
     const transformerMapper = {
@@ -101,7 +109,7 @@ function piper() {
             .on('data', (row) => {})
 
             // Format row
-            .pipe(csv.format<defs.RowType, defs.HashRowType>(parseOptions))
+            .pipe(csv.format<defs.RowType, defs.RowType>(parseOptions))
 
             // Transform row
             .transform(rowTransformer())

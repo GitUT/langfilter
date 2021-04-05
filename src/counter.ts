@@ -3,6 +3,7 @@ export default class Counter {
     private _enCount = 0;
     private _unknownCount = 0;
     private _rowsWithinDates = 0;
+    private _hashtags: {[hashtag: string]: number};
 
     // Getters
     get enCount(): number {
@@ -17,6 +18,10 @@ export default class Counter {
         return this._rowsWithinDates;
     }
 
+    get hashtagCount(): {[hashtag: string]: number} {
+        return this._hashtags;
+    }
+
     // Incrementers
     incrementEnCount() {
         ++this._enCount;
@@ -28,5 +33,13 @@ export default class Counter {
 
     incrementRowsWithinDates() {
         ++this._rowsWithinDates;
+    }
+
+    incrementHashTagCount(hashtag: string) {
+        if (hashtag in this._hashtags) {
+            ++this._hashtags[hashtag];
+        } else {
+            this._hashtags[hashtag] = 0;
+        }
     }
 }
