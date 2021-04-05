@@ -41,45 +41,83 @@ function rowTransformer() {
         } else {
             cb(null, null);
         }
+    }5
+
+    function onHashtags(row: defs.HashRowType, cb) {
+
     }
 
     const transformerMapper = {
         [defs.Action.language]: onLanguage,
         [defs.Action.date]: onDate,
+        [defs.Action.hashtags]: onHashtags,
     }
 
     return transformerMapper[action];
 }
 
-console.time('timer');
+function piper() {
+    function onCount() {
+        // Parse file
+        readStream.pipe(parser)
+            .on('error', error => ui.error(error))
+            .on('end', (rowCount: number) => {
+                ui.onEnd(action, counter, rowCount);
+            })
 
-if (action == defs.Action.count) {
-    readStream.pipe(csv.parse({headers: true}))
-        .on('error', error => ui.error(error))
-        .on('end', (rowCount: number) => {
-            ui.message(`Parsed ${rowCount} rows`);
-            console.timeEnd('timer');
-        })
-        .on('data', (row) => {});
-} else {
-    // Parse file
-    readStream.pipe(parser)
-        .on('error', error => ui.error(error))
-        .on('end', (rowCount: number) => {
-            ui.onEnd(action, counter, rowCount);
-        })
+            // Necessary for incrementing rowCount
+            .on('data', (row) => {});
+    }
 
-        // Necessary for incrementing rowCount
-        .on('data', (row) => {})
+    function onTransform() {
+        // Parse file
+        readStream.pipe(parser)
+            .on('error', error => ui.error(error))
+            .on('end', (rowCount: number) => {
+                ui.onEnd(action, counter, rowCount);
+            })
 
-        // Format row
-        .pipe(csv.format<defs.RowType, defs.RowType>(parseOptions))
+            // Necessary for incrementing rowCount
+            .on('data', (row) => {})
 
-        // Transform row
-        .transform(rowTransformer())
-        // Write to file
-        .pipe(writeStream);
+            // Format row
+            .pipe(csv.format<defs.RowType, defs.RowType>(parseOptions))
+
+            // Transform row
+            .transform(rowTransformer())
+            // Write to file
+            .pipe(writeStream);
+    }
+
+    function onHashtags() {
+        // Parse file
+        readStream.pipe(parser)
+            .on('error', error => ui.error(error))
+            .on('end', (rowCount: number) => {
+                ui.onEnd(action, counter, rowCount);
+            })
+
+            // Necessary for incrementing rowCount
+            .on('data', (row) => {})
+
+            // Format row
+            .pipe(csv.format<defs.RowType, defs.HashRowType>(parseOptions))
+
+            // Transform row
+            .transform(rowTransformer())
+            // Write to file
+            .pipe(writeStream);
+    }
+
+    const piperMapper = {
+        [defs.Action.count]: onCount,
+        [defs.Action.language]: onTransform,
+        [defs.Action.date]: onTransform,
+        [defs.Action.hashtags]: onHashtags
+    }
+
+    piperMapper[action]();
 }
 
-
-
+console.time('timer');
+piper();

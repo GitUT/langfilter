@@ -29,9 +29,14 @@ export function onEnd(action: defs.Action, counter: Counter, rowCount: number): 
         message("Rows within dates: " + counter.rowsWithinDates);
     }
 
+    function onCount(): void {
+
+    }
+
     const actionMapper = {
         [defs.Action.language]: onLanguage,
         [defs.Action.date]: onDate,
+        [defs.Action.count]: onCount,
     }
 
     message(`Parsed ${rowCount} rows`);

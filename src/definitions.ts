@@ -3,15 +3,16 @@
 export enum Action {
     language = "language",
     date = "date",
-    count = "count"
+    count = "count",
+    hashtags = "hashtags",
 }
 
 
 // Files
-export const inFile = "loppujakso.csv";
+export const inFile = "loppujakso_en.csv";
 export const inFilePath = __dirname+"/../assets/" + inFile;
 
-export const outFile = "loppujakso_en.csv";
+export const outFile = "fasfsa.csv";
 export const outFilePath = __dirname+"/../assets/" + outFile;
 
 // Row types for transformation
@@ -25,6 +26,11 @@ export type RowType = {
     likes: string,
     retweets: string,
     text: string,
+}
+
+export type HashRowType = {
+    hashtag: string,
+    frequency: string
 }
 
 // Dates
