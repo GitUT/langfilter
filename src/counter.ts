@@ -39,7 +39,7 @@ export default class Counter {
         if (hashtag in this._hashtags) {
             ++this._hashtags[hashtag];
         } else {
-            this._hashtags[hashtag] = 0;
+            this._hashtags[hashtag] = 1;
         }
     }
 }

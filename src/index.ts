@@ -18,9 +18,7 @@ const parseOptions = {headers: true, delimiter: ";"};
 const parser = csv.parse(parseOptions);
 
 function hashFinder(tweet: string): string[] {
-    const hashtags = twitter.extractHashtags(tweet);
-    console.log(hashtags);
-    return hashtags;
+    return twitter.extractHashtags(tweet);
 }
 
 function rowTransformer() {
@@ -107,6 +105,10 @@ function piper() {
             .on('error', error => ui.error(error))
             .on('end', (rowCount: number) => {
                 ui.onEnd(action, counter, rowCount);
+
+                const sortedArray = Object.entries(counter.hashtagCount).sort(([,b],[,a]) => a-b)
+                // const mostUsedArray = sortedArray.slice(0,10);
+                console.log(sortedArray.slice(0,10));
             })
 
             // Necessary for incrementing rowCount
@@ -116,9 +118,7 @@ function piper() {
             .pipe(csv.format<defs.RowType, defs.RowType>(parseOptions))
 
             // Transform row
-            .transform(rowTransformer())
-            // Write to file
-            .pipe(writeStream);
+            .transform(rowTransformer());
     }
 
     const piperMapper = {
