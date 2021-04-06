@@ -6,6 +6,7 @@ import twitter from 'twitter-text';
 import * as ui from "./ui.js";
 import * as defs from "./definitions.js";
 import Counter from "./counter.js";
+import {outFile} from "./definitions.js";
 
 
 
@@ -14,7 +15,7 @@ const counter = new Counter();
 
 const readStream = fs.createReadStream(defs.inFilePath);
 const writeStream = fs.createWriteStream(defs.outFilePath);
-const parseOptions = {headers: true, delimiter: ";"};
+const parseOptions = {headers: true, delimiter: defs.delimiter};
 const parser = csv.parse(parseOptions);
 
 function hashFinder(tweet: string): string[] {
@@ -49,18 +50,9 @@ function rowTransformer() {
         }
     }
 
-    function onHashtags(row: defs.RowType, cb) {
-        const hashtags = hashFinder(row.text);
-        for (let hashtag of hashtags) {
-            counter.incrementHashTagCount(hashtag);
-        }
-            cb(null, null);
-    }
-
     const transformerMapper = {
         [defs.Action.language]: onLanguage,
         [defs.Action.date]: onDate,
-        [defs.Action.hashtags]: onHashtags,
     }
 
     return transformerMapper[action];
@@ -106,19 +98,24 @@ function piper() {
             .on('end', (rowCount: number) => {
                 ui.onEnd(action, counter, rowCount);
 
-                const sortedArray = Object.entries(counter.hashtagCount).sort(([,b],[,a]) => a-b)
-                // const mostUsedArray = sortedArray.slice(0,10);
-                console.log(sortedArray.slice(0,10));
+                const sortedArray = Object.entries(counter.hashtagCount)
+                    .sort(([,b],[,a]) => a-b);
+                const mostUsed = sortedArray.slice(0,10);
+
+                ui.message("Most used hashtags, written into " + outFile);
+                ui.message(mostUsed);
+                mostUsed.forEach((pair) => {
+                    writeStream.write(pair[0] + defs.delimiter + pair[1] + '\n');
+                });
             })
 
-            // Necessary for incrementing rowCount
-            .on('data', (row) => {})
-
-            // Format row
-            .pipe(csv.format<defs.RowType, defs.RowType>(parseOptions))
-
-            // Transform row
-            .transform(rowTransformer());
+            // Count hashtags
+            .on('data', (row) => {
+                const hashtags = hashFinder(row.text);
+                for (let hashtag of hashtags) {
+                    counter.incrementHashTagCount(hashtag);
+                }
+            });
     }
 
     const piperMapper = {

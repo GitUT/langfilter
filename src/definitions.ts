@@ -10,16 +10,18 @@ export enum Action {
     hashtags = "hashtags",
 }
 
-
 // Files
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export const inFile = "loppujakso_en.csv";
+export const inFile = "tweets_17_12_2017_1_2_2018_filtered.csv";
 export const inFilePath = __dirname+"/../assets/" + inFile;
 
-export const outFile = "fasfsa.csv";
+export const outFile = "tweets_17_12_2017_1_2_2018_filtered_top_hashtags.csv";
 export const outFilePath = __dirname+"/../assets/" + outFile;
+
+// Delimiter used
+export const delimiter = ",";
 
 // Row types for transformation
 export type RowType = {

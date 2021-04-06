@@ -7,7 +7,7 @@ import Counter from "./counter.js";
 const prompter = promptMaker();
 
 export function actionPrompt(): defs.Action {
-    message("Choose from actions: count, language, date: ");
+    message("Choose from actions: count, language, date, hashtags: ");
     const action: string = prompter("> ");
     if (!(action in defs.Action)) {
         message("Unknown action. Exiting program");
@@ -50,7 +50,7 @@ export function onEnd(action: defs.Action, counter: Counter, rowCount: number): 
     console.timeEnd('timer');
 }
 
-export function message(message: string) {
+export function message(message) {
     console.log(message);
 }
 export function error(error: Error) {
