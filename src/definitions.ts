@@ -17,7 +17,7 @@ const __dirname = dirname(__filename);
 export const inFile = "tweets_17_12_2017_1_2_2018_filtered.csv";
 export const inFilePath = __dirname+"/../assets/" + inFile;
 
-export const outFile = "tweets_17_12_2017_1_2_2018_filtered_top_hashtags.csv";
+export const outFile = "tweets_17_12_2017_1_2_2018_filtered_top20_hashtags.csv";
 export const outFilePath = __dirname+"/../assets/" + outFile;
 
 // Delimiter used
@@ -52,4 +52,6 @@ const date6 = new Date('2018-05-10 23:22:18.999Z');
 export const startDate = date3;
 export const endDate = date4;
 
+// Hashtags
+export const topHashTagsToExtract = 20;
 

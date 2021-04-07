@@ -100,7 +100,7 @@ function piper() {
 
                 const sortedArray = Object.entries(counter.hashtagCount)
                     .sort(([,b],[,a]) => a-b);
-                const mostUsed = sortedArray.slice(0,10);
+                const mostUsed = sortedArray.slice(0,defs.topHashTagsToExtract);
 
                 ui.message("Most used hashtags, written into " + outFile);
                 ui.message(mostUsed);
