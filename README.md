@@ -22,6 +22,16 @@ Node.js
 example.env contains example configurations and assets/example.csv contains an example input file.
 To analyse a different .csv-dataset, put it into the assets folder and set the input file in the .env file to point to it.
 
+<h2>Libraries used</h2>
+These will be installed when running npm run install
+<ul>
+  <li>https://github.com/dachev/node-cld</li>
+  <li>https://github.com/motdotla/dotenv</li>
+  <li>https://github.com/twitter/twitter-text</li>
+  <li>https://github.com/C2FO/fast-csv</li>
+  <li>https://github.com/heapwolf/prompt-sync</li>
+</ul>
+
 <h2>Resources</h2>
 The dataset by Kaggle user alaix14 we analyzed as part of the assignment: https://www.kaggle.com/alaix14/bitcoin-tweets-20160101-to-20190329
 The program works on any dataset that conforms to the same syntax. Delimiter can be changed from .env
