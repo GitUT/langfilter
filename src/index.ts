@@ -64,20 +64,19 @@ function piper() {
         readStream.pipe(parser)
             .on('error', error => ui.error(error))
             .on('end', (rowCount: number) => {
-                ui.onEnd(action, counter, rowCount);
+                ui.onEnd(rowCount);
             })
 
             // Necessary for incrementing rowCount
-            .on('data', (row) => {});
+            .on('data', (row) => {
+
+            });
     }
 
     function onTransform() {
         // Parse file
         readStream.pipe(parser)
             .on('error', error => ui.error(error))
-            .on('end', (rowCount: number) => {
-                ui.onEnd(action, counter, rowCount);
-            })
 
             // Necessary for incrementing rowCount
             .on('data', (row) => {})
@@ -88,7 +87,10 @@ function piper() {
             // Transform row
             .transform(rowTransformer())
             // Write to file
-            .pipe(writeStream);
+            .pipe(writeStream)
+            .on('finish', () => {
+                ui.onFinish(action, counter);
+            });
     }
 
     function onHashtags() {
@@ -96,7 +98,7 @@ function piper() {
         readStream.pipe(parser)
             .on('error', error => ui.error(error))
             .on('end', (rowCount: number) => {
-                ui.onEnd(action, counter, rowCount);
+                ui.onEnd(rowCount);
 
                 const sortedArray = Object.entries(counter.hashtagCount)
                     .sort(([,b],[,a]) => a-b);

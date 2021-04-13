@@ -18,8 +18,13 @@ export function actionPrompt(): defs.Action {
     return action as defs.Action;
 }
 
+// Printer function for end of readtream
+export function onEnd(rowCount: number): void {
+    message(`Parsed ${rowCount} rows`);
+}
+
 // Printer function
-export function onEnd(action: defs.Action, counter: Counter, rowCount: number): void {
+export function onFinish(action: defs.Action, counter: Counter): void {
     function onLanguage(): void {
         message("Detected English: " + counter.enCount);
         message("Unknowns: " + counter.unknownCount);
@@ -29,10 +34,6 @@ export function onEnd(action: defs.Action, counter: Counter, rowCount: number): 
         message("Rows within dates: " + counter.rowsWithinDates);
     }
 
-    function onCount(): void {
-
-    }
-
     function onHashtags(): void {
 
     }
@@ -40,11 +41,9 @@ export function onEnd(action: defs.Action, counter: Counter, rowCount: number): 
     const actionMapper = {
         [defs.Action.language]: onLanguage,
         [defs.Action.date]: onDate,
-        [defs.Action.count]: onCount,
         [defs.Action.hashtags]: onHashtags
     }
 
-    message(`Parsed ${rowCount} rows`);
     actionMapper[action]();
     message('Time elapsed: ');
     console.timeEnd('timer');

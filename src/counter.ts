@@ -1,7 +1,7 @@
 // Counter
 export default class Counter {
-    private _enCount = 0;
-    private _unknownCount = 0;
+    _enCount = 0;
+    _unknownCount = 0;
     private _rowsWithinDates = 0;
     private _hashtags: {[hashtag: string]: number} = {};
 

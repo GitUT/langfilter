@@ -1,4 +1,6 @@
 .idea/
-assets/
 dist/
 node_modules/
+.env
+assets/*
+!assets/example.csv
