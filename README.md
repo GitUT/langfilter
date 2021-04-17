@@ -13,7 +13,7 @@ Node.js
 <ol>
 <li>Clone the repository</li>
 <li>Open the installation folder</li>
-<li>run npm install</li>
+<li>npm install</li>
 <li>rename example.env -> .env</li>
 <li>Optionally change configurations in .env file</li>
 <li>npm run start</li>
